@@ -7,6 +7,7 @@ from src.config import DEFAULT_SEPARATOR, DEFAULT_OUTPUT_DIR, DEFAULT_SAMPLE_NAM
 import pandas as pd
 import os
 import logging
+import chardet
 
 # Configuration des logs pour enregistrer les erreurs dans un fichier 'app.log'
 logging.basicConfig(filename='app.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -16,6 +17,8 @@ if 'df' not in st.session_state:
     st.session_state.df = None  # DataFrame chargé (sera rempli une fois le fichier uploadé)
 if 'separator' not in st.session_state:
     st.session_state.separator = DEFAULT_SEPARATOR  # Séparateur par défaut pour les fichiers CSV
+if 'encoding' not in st.session_state:
+    st.session_state.encoding = 'utf-8'  # Encodage par défaut
 if 'loaded' not in st.session_state:
     st.session_state.loaded = False  # Indique si un fichier a été chargé ou non
 if 'selected_columns' not in st.session_state:
@@ -31,18 +34,31 @@ if 'selected_analyses' not in st.session_state:
 if 'mode' not in st.session_state:
     st.session_state.mode = None  # Mode actuel de l'application : None (menu principal), "eda" ou "traitement"
 
-# Titre principal de l'application affiché en haut de la page
+# Fonction pour détecter l'encodage du fichier
+def detect_encoding(file):
+    """
+    Détecte l'encodage d'un fichier via un échantillon (chardet).
+    
+    :param file: Objet fichier (ex. uploaded_file de Streamlit)
+    :return: Encodage détecté (ex: 'utf-8', 'iso-8859-1', 'ascii')
+    """
+    file.seek(0)  # Remettre le curseur au début du fichier
+    sample = file.read(1024)  # Lire un échantillon
+    result = chardet.detect(sample)
+    return result['encoding']
+
+# Titre principal de l'application
 st.title("Data Toolkit")
 
-# Ajout du logo dans la barre latérale, en haut à gauche
-st.sidebar.image("logo.png", use_container_width=True)  # Affiche le fichier 'logo.png' en ajustant sa largeur à la sidebar
+# Ajout du logo dans la barre latérale
+st.sidebar.image("logo.png", use_container_width=True)
 
-# Ajout des informations dans la barre latérale, sous le logo
+# Infos dans la barre latérale
 st.sidebar.markdown("""
 ---
 **Développé par :** Ludovic Marchetti  
-**Version :** 1.0  
-**Dernière mise à jour :** 11/03/2025  
+**Version :** 1.0.1  
+**Dernière mise à jour :** 12/03/2025  
 **Contact :** contact@datahootcome.fr
 """)
 
@@ -51,113 +67,149 @@ uploaded_file = st.file_uploader("Déposez votre fichier ici", type=['csv', 'xls
 
 # Si un fichier est téléchargé, proposer des options de prévisualisation et de chargement
 if uploaded_file is not None:
-    # Si le fichier est un CSV, demander à l'utilisateur de spécifier le séparateur
+    try:
+        # Détection automatique de l'encodage
+        detected_enc = detect_encoding(uploaded_file)
+        st.info(f"Encodage détecté (chardet) : {detected_enc}")
+    except Exception as e:
+        st.error(f"Erreur lors de la détection de l'encodage : {e}")
+        detected_enc = 'utf-8'
+
+    # <-- MODIF: Liste déroulante d'encodages courants
+    common_encodings = ["utf-8", "utf-8-sig", "latin-1", "iso-8859-1", "cp1252", "ascii"]
+    # On essaie de trouver l'index du detected_enc dans la liste, sinon on met 0
+    if detected_enc in common_encodings:
+        default_enc_index = common_encodings.index(detected_enc)
+    else:
+        default_enc_index = 0  # 'utf-8' en fallback
+
+    st.session_state.encoding = st.selectbox(
+        "Choisir l'encodage du fichier",
+        options=common_encodings,
+        index=default_enc_index
+    )
+
+    # Si le fichier est un CSV, demander un séparateur
     if uploaded_file.name.endswith('.csv'):
-        st.session_state.separator = st.text_input(
-            "Entrez le séparateur utilisé dans le fichier CSV (ex: ',', ';', '\\t')", 
-            value=st.session_state.separator
+        # <-- MODIF: Liste déroulante de séparateurs classiques
+        separators = [",", ";", "\\t", "|"]
+        # On détecte si st.session_state.separator est dans la liste, sinon on met 0
+        if st.session_state.separator in separators:
+            default_sep_index = separators.index(st.session_state.separator)
+        else:
+            default_sep_index = 0
+
+        st.session_state.separator = st.selectbox(
+            "Choisir le séparateur CSV",
+            options=separators,
+            index=default_sep_index
         )
     else:
-        st.session_state.separator = None  # Pas besoin de séparateur pour un fichier Excel
+        # Fichier Excel -> pas de séparateur
+        st.session_state.separator = None
 
-    # Bouton pour prévisualiser les 5 premières lignes du fichier
+    # Bouton pour prévisualiser
     if st.button("Prévisualiser les données"):
         try:
-            uploaded_file.seek(0)  # Remet le pointeur au début du fichier pour le lire
-            if uploaded_file.name.endswith('.csv'):
-                df_preview = pd.read_csv(uploaded_file, sep=st.session_state.separator, nrows=5)
-            else:
-                df_preview = pd.read_excel(uploaded_file, nrows=5)
-            st.write("**Aperçu des données :**")
-            st.dataframe(df_preview, use_container_width=True)  # Affiche les 5 premières lignes
+            uploaded_file.seek(0)  # Remet le pointeur au début
+            df_preview = load_data(
+                uploaded_file,
+                separator=st.session_state.separator,
+                encoding=st.session_state.encoding
+            )
+            st.write("**Aperçu des données (5 premières lignes) :**")
+            st.dataframe(df_preview.head(5), use_container_width=True)
         except Exception as e:
-            logging.error(f"Erreur lors de la prévisualisation : {e}")  # Enregistre l'erreur dans 'app.log'
-            st.error(f"Erreur lors de la prévisualisation : {e}")  # Affiche l'erreur à l'utilisateur
+            logging.error(f"Erreur lors de la prévisualisation : {e}")
+            st.error(f"Erreur lors de la prévisualisation : {e}")
 
-    # Bouton pour charger le fichier complet dans l'application
+    # Bouton pour charger le fichier complet
     if st.button("Charger le fichier complet") and not st.session_state.loaded:
         try:
-            uploaded_file.seek(0)  # Remet le pointeur au début du fichier
-            st.session_state.df = load_data(uploaded_file, separator=st.session_state.separator)  # Charge le fichier avec la fonction load_data
-            st.session_state.loaded = True  # Marque le fichier comme chargé
-            st.session_state.selected_columns = {col: True for col in st.session_state.df.columns}  # Sélectionne toutes les colonnes par défaut
-            st.success("Fichier chargé avec succès !")  # Confirme le succès à l'utilisateur
+            uploaded_file.seek(0)
+            st.session_state.df = load_data(
+                uploaded_file,
+                separator=st.session_state.separator,
+                encoding=st.session_state.encoding
+            )
+            st.session_state.loaded = True
+            st.session_state.selected_columns = {
+                col: True for col in st.session_state.df.columns
+            }
+            st.success("Fichier chargé avec succès !")
         except Exception as e:
             logging.error(f"Erreur lors du chargement : {e}")
             st.error(f"Erreur lors du chargement : {e}")
 
-# Si un fichier est chargé, afficher les informations et proposer des actions
+# Si un fichier est chargé, afficher des infos et proposer actions
 if st.session_state.loaded and st.session_state.df is not None:
-    df = st.session_state.df  # Récupère le DataFrame chargé
+    df = st.session_state.df
 
-    # Afficher un aperçu et des informations de base sur le dataset
+    # Aperçu + infos de base
     st.subheader("Informations de base sur le dataset")
-    st.dataframe(df.head(), use_container_width=True)  # Affiche les 5 premières lignes du dataset
-    info = get_data_info(df)  # Récupère les informations de base avec la fonction get_data_info
+    st.dataframe(df.head(), use_container_width=True)
+    info = get_data_info(df)
     st.markdown(f"**Dimensions :** {info['dimensions'][0]} lignes, {info['dimensions'][1]} colonnes")
     st.markdown("**Noms des colonnes :**")
-    st.write(", ".join(info['column_names']))  # Liste les noms des colonnes
+    st.write(", ".join(info['column_names']))
     st.markdown("**Types de données :**")
     st.dataframe(pd.DataFrame(info['data_types'].items(), columns=['Colonne', 'Type']), use_container_width=True)
     st.markdown("**Valeurs manquantes par colonne :**")
     st.dataframe(pd.DataFrame(info['missing_values'].items(), columns=['Colonne', 'Valeurs manquantes']), use_container_width=True)
-    original_size = df.memory_usage(deep=True).sum()  # Calcule la taille en mémoire du DataFrame
+    original_size = df.memory_usage(deep=True).sum()
     st.write(f"**Taille estimée en mémoire :** {original_size / (1024 * 1024):.2f} Mo")
 
-    # Si aucun mode n'est sélectionné, proposer un choix entre EDA+ et Traitement
+    # Choix du mode
     if st.session_state.mode is None:
         st.subheader("Que souhaitez-vous faire ?")
-        col1, col2 = st.columns(2)  # Crée deux colonnes pour les boutons
+        col1, col2 = st.columns(2)
         if col1.button("EDA +"):
-            st.session_state.mode = "eda"  # Passe en mode EDA+
+            st.session_state.mode = "eda"
         if col2.button("Traitement"):
-            st.session_state.mode = "traitement"  # Passe en mode Traitement
+            st.session_state.mode = "traitement"
 
-    # --- Mode EDA+ : Exploration de données avancée ---
+    # --- Mode EDA+ ---
     if st.session_state.mode == "eda":
         st.subheader("Paramétrer l'EDA avancé")
-        with st.form("eda_form"):  # Crée un formulaire pour les paramètres de l'EDA
-            # Sélection des colonnes à analyser
+        with st.form("eda_form"):
             st.write("**Sélectionnez les colonnes à analyser :**")
             for col in df.columns:
                 st.session_state.selected_columns[col] = st.checkbox(
-                    col, 
-                    value=st.session_state.selected_columns.get(col, True), 
+                    col,
+                    value=st.session_state.selected_columns.get(col, True),
                     key=f"col_{col}"
-                )  # Crée une checkbox pour chaque colonne, cochée par défaut
-            # Sélection des types d'analyse à effectuer
+                )
             st.write("**Sélectionnez les types d'analyse :**")
             analyses = ["Statistiques descriptives", "Distribution", "Corrélation", "Valeurs manquantes", "Boîtes à moustaches"]
             for analysis in analyses:
                 st.session_state.selected_analyses[analysis] = st.checkbox(
-                    analysis, 
-                    value=st.session_state.selected_analyses.get(analysis, False), 
+                    analysis,
+                    value=st.session_state.selected_analyses.get(analysis, False),
                     key=f"analysis_{analysis}"
-                )  # Crée une checkbox pour chaque type d'analyse
-            submitted = st.form_submit_button("Appliquer EDA +")  # Bouton pour lancer l'EDA
+                )
+            submitted = st.form_submit_button("Appliquer EDA +")
     
-        # Si le formulaire est soumis, afficher les résultats de l'EDA
         if submitted:
             st.subheader("Résultats de l'EDA avancé")
             selected_columns = [col for col, selected in st.session_state.selected_columns.items() if selected]
             if not selected_columns:
                 st.warning("Veuillez sélectionner au moins une colonne.")
             else:
-                df_selected = df[selected_columns]  # Filtre le DataFrame avec les colonnes sélectionnées
+                df_selected = df[selected_columns]
                 # Statistiques descriptives
                 if st.session_state.selected_analyses.get("Statistiques descriptives", False):
                     st.write("**Statistiques descriptives :**")
-                    st.dataframe(descriptive_stats(df_selected))  # Affiche les stats descriptives
+                    st.dataframe(descriptive_stats(df_selected))
                 # Distribution
                 if st.session_state.selected_analyses.get("Distribution", False):
                     numerical_cols = df_selected.select_dtypes(include=['float64', 'int64']).columns
                     for col in numerical_cols:
                         st.write(f"**Distribution de {col} :**")
-                        fig = plot_distribution(df_selected, col)  # Génère un graphique de distribution
-                        st.pyplot(fig)  # Affiche le graphique
+                        fig = plot_distribution(df_selected, col)
+                        st.pyplot(fig)
                 # Corrélation
                 if st.session_state.selected_analyses.get("Corrélation", False):
-                    fig = plot_correlation(df_selected)  # Génère une matrice de corrélation
+                    fig = plot_correlation(df_selected)
                     if fig:
                         st.write("**Matrice de corrélation :**")
                         st.pyplot(fig)
@@ -165,7 +217,7 @@ if st.session_state.loaded and st.session_state.df is not None:
                         st.write("**Corrélation :** Sélectionnez au moins deux colonnes numériques.")
                 # Valeurs manquantes
                 if st.session_state.selected_analyses.get("Valeurs manquantes", False):
-                    fig = plot_missing_values(df_selected)  # Génère un graphique des valeurs manquantes
+                    fig = plot_missing_values(df_selected)
                     if fig:
                         st.write("**Valeurs manquantes :**")
                         st.pyplot(fig)
@@ -176,55 +228,50 @@ if st.session_state.loaded and st.session_state.df is not None:
                     numerical_cols = df_selected.select_dtypes(include=['float64', 'int64']).columns
                     for col in numerical_cols:
                         st.write(f"**Boîte à moustaches pour {col} :**")
-                        fig = plot_boxplot(df_selected, col)  # Génère une boîte à moustaches
+                        fig = plot_boxplot(df_selected, col)
                         st.pyplot(fig)
-        # Bouton pour revenir au menu principal
         back_to_main()
 
-    # --- Mode Traitement : Manipulation des données ---
+    # --- Mode Traitement ---
     if st.session_state.mode == "traitement":
         st.subheader("Traitements disponibles")
-        traitement = st.selectbox("Choisissez un traitement", ["Échantillonnage"])  # Pour l'instant, seul l'échantillonnage est proposé
+        traitement = st.selectbox("Choisissez un traitement", ["Échantillonnage"])
         if traitement == "Échantillonnage":
             st.subheader("Échantillonnage du dataset")
             method = st.selectbox("Méthode d’échantillonnage", 
                                   ["random_total", "random_representatif", "first_n", "last_n"])
-            # Options pour les méthodes aléatoires
             if method in ["random_total", "random_representatif"]:
                 choice = st.radio("Choisir le nombre de lignes", ["Pourcentage", "Nombre"])
                 if choice == "Pourcentage":
                     percentage = st.slider("Pourcentage de lignes à échantillonner", 0, 100, 10)
-                    frac = percentage / 100  # Convertit le pourcentage en fraction
+                    frac = percentage / 100
                     n = None
                 else:
                     n = st.number_input("Nombre de lignes à échantillonner", min_value=1, max_value=len(df), value=min(1000, len(df)))
                     frac = None
-            else:  # Pour "first_n" ou "last_n"
+            else:
                 n = st.number_input("Nombre de lignes à échantillonner", min_value=1, max_value=len(df), value=min(1000, len(df)))
                 frac = None
 
-            # Champ pour spécifier le dossier de destination
             output_dir = st.text_input(
                 "Chemin du dossier de destination (laisser vide pour utiliser 'output' par défaut)", 
                 value=""
             )
             
-            # Gestion du dossier de sortie
             if not output_dir:
-                output_dir = os.path.join(os.getcwd(), "output")  # Utilise le dossier 'output' par défaut
+                output_dir = os.path.join(os.getcwd(), "output")
                 if not os.path.exists(output_dir):
-                    os.makedirs(output_dir)  # Crée le dossier s'il n'existe pas
+                    os.makedirs(output_dir)
                 st.info(f"Utilisation du dossier par défaut : {output_dir}")
             else:
                 st.info(f"Utilisation du dossier personnalisé : {output_dir}")
             
-            output_name = st.text_input("Nom du fichier de sortie", DEFAULT_SAMPLE_NAME)  # Nom par défaut du fichier
-            output_format = st.selectbox("Format de sortie", ["CSV", "Excel"])  # Choix du format
+            output_name = st.text_input("Nom du fichier de sortie", DEFAULT_SAMPLE_NAME)
+            output_format = st.selectbox("Format de sortie", ["CSV", "Excel"])
 
-            # Bouton pour lancer l'échantillonnage
             if st.button("Échantillonner"):
                 try:
-                    df_sample = sample_data(df, method, n, frac)  # Génère l'échantillon avec la fonction sample_data
+                    df_sample = sample_data(df, method, n, frac)
                     st.write("**Aperçu de l’échantillon :**")
                     st.dataframe(df_sample.head(), use_container_width=True)
                     st.write(f"**Dimensions de l'échantillon :** {df_sample.shape[0]} lignes, {df_sample.shape[1]} colonnes")
@@ -232,14 +279,13 @@ if st.session_state.loaded and st.session_state.df is not None:
                     st.write(f"**Taille estimée en mémoire de l'échantillon :** {sample_size / (1024 * 1024):.2f} Mo")
                     if output_format == "CSV":
                         output_path = os.path.join(output_dir, f"{output_name}.csv")
-                        df_sample.to_csv(output_path, index=False)  # Sauvegarde en CSV
+                        df_sample.to_csv(output_path, index=False)
                         st.success(f"Fichier sauvegardé sous {output_path}")
                     else:
                         output_path = os.path.join(output_dir, f"{output_name}.xlsx")
-                        df_sample.to_excel(output_path, index=False)  # Sauvegarde en Excel
+                        df_sample.to_excel(output_path, index=False)
                         st.success(f"Fichier sauvegardé sous {output_path}")
                 except Exception as e:
                     logging.error(f"Erreur lors de l’échantillonnage : {e}")
                     st.error(f"Erreur lors de l’échantillonnage : {e}")
-        # Bouton pour revenir au menu principal
         back_to_main()
