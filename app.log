@@ -16,3 +16,8 @@
 2025-03-11 23:39:25,571 - ERROR - Erreur lors de la prévisualisation : 'ascii' codec can't decode byte 0xef in position 2636: ordinal not in range(128)
 2025-03-11 23:39:31,763 - ERROR - Erreur lors de la prévisualisation : 'ascii' codec can't decode byte 0xef in position 2636: ordinal not in range(128)
 2025-03-11 23:39:50,464 - ERROR - Erreur lors de la prévisualisation : 'ascii' codec can't decode byte 0xef in position 2636: ordinal not in range(128)
+2025-03-12 00:07:59,442 - ERROR - Erreur lors de la prévisualisation : 'ascii' codec can't decode byte 0xef in position 2636: ordinal not in range(128)
+2025-03-12 00:08:21,310 - ERROR - Erreur lors de la prévisualisation : 'utf-8' codec can't decode bytes in position 7250-7251: invalid continuation byte
+2025-03-12 00:08:51,173 - ERROR - Erreur lors de la prévisualisation : 'utf-8' codec can't decode bytes in position 7250-7251: invalid continuation byte
+2025-03-12 00:08:58,086 - ERROR - Erreur lors de la prévisualisation : 'utf-8' codec can't decode bytes in position 7250-7251: invalid continuation byte
+2025-03-12 00:13:17,915 - ERROR - Erreur lors de la prévisualisation : 'ascii' codec can't decode byte 0xef in position 2636: ordinal not in range(128)

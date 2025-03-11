@@ -57,8 +57,8 @@ st.sidebar.image("logo.png", use_container_width=True)
 st.sidebar.markdown("""
 ---
 **Développé par :** Ludovic Marchetti  
-**Version :** 1.0  
-**Dernière mise à jour :** 11/03/2025  
+**Version :** 1.0.1  
+**Dernière mise à jour :** 12/03/2025  
 **Contact :** contact@datahootcome.fr
 """)
 
