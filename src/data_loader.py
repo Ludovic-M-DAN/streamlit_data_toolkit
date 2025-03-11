@@ -1,11 +1,12 @@
 import pandas as pd
 
-def load_data(file_path, separator=','):
+def load_data(file_path, separator=',', encoding='utf-8'):
     """
     Charge un fichier CSV ou Excel dans un DataFrame pandas.
     
     :param file_path: Chemin du fichier (str) ou objet fichier (par exemple, UploadedFile)
     :param separator: Séparateur pour les fichiers CSV (par défaut ',')
+    :param encoding: Encodage du fichier (par défaut 'utf-8')
     :return: DataFrame pandas
     """
     # Vérifie si file_path est une chaîne ou un objet fichier
@@ -15,7 +16,7 @@ def load_data(file_path, separator=','):
         file_name = file_path.name  # Suppose que l'objet a un attribut 'name'
     
     if file_name.endswith('.csv'):
-        return pd.read_csv(file_path, sep=separator)
+        return pd.read_csv(file_path, sep=separator, encoding=encoding)
     elif file_name.endswith('.xlsx'):
         return pd.read_excel(file_path)
     else:

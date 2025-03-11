@@ -1,2 +1,18 @@
 2025-03-11 21:27:17,386 - ERROR - Erreur lors de la prévisualisation : 'utf-8' codec can't decode byte 0xe9 in position 141: invalid continuation byte
 2025-03-11 21:27:27,992 - ERROR - Erreur lors de la prévisualisation : 'utf-8' codec can't decode byte 0xe9 in position 141: invalid continuation byte
+2025-03-11 23:12:58,639 - ERROR - Erreur lors de la prévisualisation : 'utf-8' codec can't decode bytes in position 7250-7251: invalid continuation byte
+2025-03-11 23:13:06,234 - ERROR - Erreur lors de la prévisualisation : 'utf-8' codec can't decode bytes in position 7250-7251: invalid continuation byte
+2025-03-11 23:13:09,490 - ERROR - Erreur lors de la prévisualisation : only single character unicode strings can be converted to Py_UCS4, got length 0
+2025-03-11 23:14:05,405 - ERROR - Erreur lors du chargement : only single character unicode strings can be converted to Py_UCS4, got length 0
+2025-03-11 23:16:22,463 - ERROR - Erreur lors de la prévisualisation : only single character unicode strings can be converted to Py_UCS4, got length 0
+2025-03-11 23:22:54,566 - ERROR - Erreur lors de la prévisualisation : 'utf-8' codec can't decode bytes in position 7250-7251: invalid continuation byte
+2025-03-11 23:32:44,004 - ERROR - Erreur lors de la prévisualisation : 'ascii' codec can't decode byte 0xef in position 2636: ordinal not in range(128)
+2025-03-11 23:33:36,537 - ERROR - Erreur lors de la prévisualisation : 'ascii' codec can't decode byte 0xef in position 2636: ordinal not in range(128)
+2025-03-11 23:33:40,706 - ERROR - Erreur lors de la prévisualisation : only single character unicode strings can be converted to Py_UCS4, got length 0
+2025-03-11 23:33:44,047 - ERROR - Erreur lors de la prévisualisation : 'ascii' codec can't decode byte 0xef in position 2636: ordinal not in range(128)
+2025-03-11 23:34:05,242 - ERROR - Erreur lors de la prévisualisation : only single character unicode strings can be converted to Py_UCS4, got length 0
+2025-03-11 23:37:32,390 - ERROR - Erreur lors de la prévisualisation : only single character unicode strings can be converted to Py_UCS4, got length 0
+2025-03-11 23:39:17,331 - ERROR - Erreur lors de la prévisualisation : 'ascii' codec can't decode byte 0xef in position 2636: ordinal not in range(128)
+2025-03-11 23:39:25,571 - ERROR - Erreur lors de la prévisualisation : 'ascii' codec can't decode byte 0xef in position 2636: ordinal not in range(128)
+2025-03-11 23:39:31,763 - ERROR - Erreur lors de la prévisualisation : 'ascii' codec can't decode byte 0xef in position 2636: ordinal not in range(128)
+2025-03-11 23:39:50,464 - ERROR - Erreur lors de la prévisualisation : 'ascii' codec can't decode byte 0xef in position 2636: ordinal not in range(128)
