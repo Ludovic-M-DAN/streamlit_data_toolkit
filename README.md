@@ -1,4 +1,5 @@
-# Data Toolkit 
+# <img src="https://raw.githubusercontent.com/Ludovic-M-DAN/streamlit_data_toolkit/main/logo.png" alt="Logo" width="40" style="vertical-align: text-bottom;"/> Data Toolkit
+
 Une application Streamlit interactive pour explorer, analyser et traiter des fichiers CSV ou Excel.
 
 ## Description
@@ -40,6 +41,3 @@ Cette application Streamlit a été conçue pour simplifier l’analyse de donn�
 2. Installe les dépendances : `pip install -r requirements.txt`
 <<<<<<< Updated upstream
 3. Lance l’app : `streamlit run app.py`
-=======
-3. Lance l’app : `streamlit run app.py`
->>>>>>> Stashed changes
