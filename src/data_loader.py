@@ -4,13 +4,19 @@ def load_data(file_path, separator=','):
     """
     Charge un fichier CSV ou Excel dans un DataFrame pandas.
     
-    :param file_path: Chemin ou objet fichier à charger
+    :param file_path: Chemin du fichier (str) ou objet fichier (par exemple, UploadedFile)
     :param separator: Séparateur pour les fichiers CSV (par défaut ',')
     :return: DataFrame pandas
     """
-    if file_path.name.endswith('.csv'):
+    # Vérifie si file_path est une chaîne ou un objet fichier
+    if isinstance(file_path, str):
+        file_name = file_path
+    else:
+        file_name = file_path.name  # Suppose que l'objet a un attribut 'name'
+    
+    if file_name.endswith('.csv'):
         return pd.read_csv(file_path, sep=separator)
-    elif file_path.name.endswith('.xlsx'):
+    elif file_name.endswith('.xlsx'):
         return pd.read_excel(file_path)
     else:
         raise ValueError("Format de fichier non supporté. Veuillez utiliser CSV ou Excel.")

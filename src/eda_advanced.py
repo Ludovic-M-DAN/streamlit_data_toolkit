@@ -23,17 +23,17 @@ def plot_correlation(df):
     return None
 
 def plot_missing_values(df):
-    """Génère un barplot des valeurs manquantes par colonne."""
     missing_values = df.isnull().sum()
     if missing_values.sum() > 0:
         fig, ax = plt.subplots()
         sns.barplot(x=missing_values.index, y=missing_values.values, ax=ax)
-        ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
+        ax.set_xticks(range(len(missing_values.index)))  # Définit les ticks explicitement
+        ax.set_xticklabels(missing_values.index, rotation=90)
         return fig
     return None
 
 def plot_boxplot(df, col):
     """Génère une boîte à moustaches pour la colonne spécifiée."""
     fig, ax = plt.subplots()
-    sns.boxplot(x=df[col], ax=ax)
+    sns.boxplot(x=df[col], ax=ax,orient='v')
     return fig

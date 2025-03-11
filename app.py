@@ -32,7 +32,7 @@ if 'mode' not in st.session_state:
     st.session_state.mode = None  # Mode actuel de l'application : None (menu principal), "eda" ou "traitement"
 
 # Titre principal de l'application affiché en haut de la page
-st.title("Trousse à outils pour datasets")
+st.title("Data Toolkit")
 
 # Ajout du logo dans la barre latérale, en haut à gauche
 st.sidebar.image("logo.png", use_container_width=True)  # Affiche le fichier 'logo.png' en ajustant sa largeur à la sidebar
