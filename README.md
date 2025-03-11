@@ -40,5 +40,4 @@ Cette application Streamlit a été conçue pour simplifier l’analyse de donn�
 ## Comment l’utiliser ?
 1. Clone le dépôt : `git clone https://github.com/ton-utilisateur/ton-projet.git`
 2. Installe les dépendances : `pip install -r requirements.txt`
-<<<<<<< Updated upstream
 3. Lance l’app : `streamlit run app.py`
