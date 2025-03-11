@@ -2,6 +2,11 @@
 
 Une application Streamlit interactive pour explorer, analyser et traiter des fichiers CSV ou Excel.
 
+## Technologies
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)
+
 ## Description
 Cette application Streamlit a été conçue pour simplifier l’analyse de données. Elle permet de charger facilement des fichiers CSV ou Excel, de prévisualiser leur contenu et de réaliser des **analyses exploratoires (EDA)** adaptées à vos besoins. Vous pouvez aussi appliquer des **traitements** comme l’échantillonnage ou le filtrage, rendant la manipulation des datasets plus fluide.
 
@@ -31,10 +36,6 @@ Cette application Streamlit a été conçue pour simplifier l’analyse de donn�
   - Options : Sélection par pourcentage ou nombre exact de lignes.
   - Exportation : Sauvegarde de l’échantillon généré.
     
-## Technologies
-![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
-![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)
 
 ## Comment l’utiliser ?
 1. Clone le dépôt : `git clone https://github.com/ton-utilisateur/ton-projet.git`
