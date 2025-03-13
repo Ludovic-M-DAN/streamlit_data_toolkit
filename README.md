@@ -108,7 +108,7 @@ Pour voir toutes les dépendances, consultez le fichier [`requirements.txt`](req
 
 ## 🎥 Vidéo
 🎬 ![Vidéo](https://img.shields.io/badge/Video-Play-green?style=flat&logo=youtube&logoColor=white)  
-🚧 En cours de préparation 🚧
+[![Regarder la vidéo](https://img.youtube.com/vi/ID_DE_LA_VIDEO/maxresdefault.jpg)](https://www.youtube.com/watch?v=ID_DE_LA_VIDEO)
 
 ## 🤝 Contribuer
 1. Fork le repo.
