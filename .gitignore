@@ -1,6 +1,21 @@
-venv/
-output/
+# Ignorer les fichiers de logs
 *.log
+
+# Ignorer les fichiers batch Windows
+*.bat
+
+# Ignorer les environnements virtuels
+venv/
+
+# Ignorer les caches Python
 __pycache__/
 *.py[cod]
-.DS_Store"app.log" 
+
+# Ignorer les fichiers système
+.DS_Store
+
+# Ignorer les fichiers de sortie
+output/
+
+# Ignorer les fichiers .exe
+*.exe
