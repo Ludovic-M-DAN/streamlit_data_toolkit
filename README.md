@@ -8,20 +8,20 @@
 **Data Toolkit** est une application interactive Streamlit qui simplifie l'exploration, l'analyse et le traitement de fichiers CSV ou Excel. Elle s'adresse aux data scientists, analystes ou toute personne souhaitant explorer ses données via une interface intuitive.
 
 ## 🎯 Motivation
-L’objectif est de centraliser les étapes courantes de l’analyse de données (souvent dispersées dans des scripts ou notebooks) dans un outil convivial, pour gagner du temps et se concentrer sur l’interprétation des résultats.
+L’objectif est de centraliser les étapes courantes de l’analyse de données (souvent dispersées dans des scripts ou notebooks) dans un outil convivial, afin de gagner du temps et de se concentrer sur l’interprétation des résultats.
 
 ## 🚀 Fonctionnalités
 
 ### Basiques
 - **Chargement** : Import de fichiers CSV/Excel (jusqu’à 5 Go) avec séparateur personnalisé.
 - **Prévisualisation** : Aperçu des 5 premières lignes avant chargement complet.
-- **Informations de base** : Dimensions, types de colonnes, valeurs manquantes, taille en mémoire.
-- **Traitement** : Échantillonnage (aléatoire, premières/dernières N lignes) avec export.
+- **EDA simple** : Dimensions, types de colonnes, valeurs manquantes, taille en mémoire.
 
 ### Avancées
 - **EDA+** : Statistiques descriptives, visualisations (histogrammes, corrélations, boîtes à moustaches, valeurs manquantes).
 - **Personnalisation** : Choix des colonnes et des analyses.
-- **Logs** : Gestion des erreurs dans `app.log`.
+- **Logs** : Gestion des erreurs dans app.log.
+- **Traitement** : Échantillonnage (aléatoire, premières/dernières N lignes) avec export.
 
 ## 📂 Structure du Repository
 ```
@@ -48,42 +48,74 @@ streamlit_data_toolkit/
 ## 🛠️ Installation
 
 1. **Cloner le repo** :
-```bash
-git clone https://github.com/Ludovic-M-DAN/streamlit_data_toolkit.git
-cd streamlit_data_toolkit
-```
+   ```bash
+   git clone https://github.com/Ludovic-M-DAN/streamlit_data_toolkit.git
+   cd streamlit_data_toolkit
+   ```
 
 2. **Créer un environnement virtuel (optionnel)** :
-```bash
-python -m venv venv
-source venv/bin/activate  # Windows : venv\Scripts\activate
-```
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Sous Windows : venv\Scripts\activate
+   ```
 
 3. **Installer les dépendances** :
-```bash
-pip install -r requirements.txt
-```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 4. **Lancer l’app** :
-```bash
+   ```bash
+   streamlit run app.py
+   ```
+
+Ouvrez [http://localhost:8501](http://localhost:8501) dans votre navigateur.
+
+### Astuce rapide pour ne pas se compliquer la vie
+Pour lancer l’application rapidement, créez un fichier batch `run_app.bat` à la racine du projet avec le contenu suivant :
+
+```bat
+@echo off
+python -m venv venv
+call venv\Scripts\activate
+pip install -r requirements.txt
+start "" http://localhost:8501
 streamlit run app.py
+pause
 ```
 
-Ouvre http://localhost:8501 dans ton navigateur.
+## 📦 Dépendances principales
+![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=flat&logo=python&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-2.2.3-150458?style=flat&logo=pandas&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-3.10.1-11557C?style=flat&logo=python&logoColor=white)
+![Seaborn](https://img.shields.io/badge/Seaborn-0.13.2-4E148C?style=flat&logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.43.1-FF4B4B?style=flat&logo=streamlit&logoColor=white)
+
+Le projet repose sur les bibliothèques suivantes :
+- **[Python](https://www.python.org/)** (>= 3.7)
+- **[Streamlit](https://streamlit.io/)** (1.43.1) – Interface interactive
+- **[Pandas](https://pandas.pydata.org/)** (2.2.3) – Manipulation des données
+- **[Matplotlib](https://matplotlib.org/)** (3.10.1) – Visualisation basique
+- **[Seaborn](https://seaborn.pydata.org/)** (0.13.2) – Visualisation avancée
+- **[NumPy](https://numpy.org/)** (2.2.3) – Calcul scientifique
+- **[OpenPyXL](https://openpyxl.readthedocs.io/en/stable/)** (3.1.5) – Gestion des fichiers Excel
+- **[PyArrow](https://arrow.apache.org/)** (19.0.1) – Support des formats optimisés
+
+Pour voir toutes les dépendances, consultez le fichier [`requirements.txt`](requirements.txt).
 
 ## 📖 Documentation
-- **Guide utilisateur** : Instructions détaillées avec captures d’écran.
-- **Référence API** : Détails des fonctions.
+🚧 En cours de construction 🚧
 
-## 📸 Captures d’écran
-(en cours)
+## 🎥 Vidéo
+🎬 ![Vidéo](https://img.shields.io/badge/Video-Play-green?style=flat&logo=youtube&logoColor=white)  
+🚧 En cours de préparation 🚧
 
 ## 🤝 Contribuer
 1. Fork le repo.
-2. Crée une branche (`git checkout -b feature/ton-apport`).
-3. Commit tes changements (`git commit -m "Ajout de X"`).
-4. Push (`git push origin feature/ton-apport`).
-5. Ouvre une Pull Request.
+2. Créez une branche (`git checkout -b feature/ton-apport`).
+3. Committez vos changements (`git commit -m "Ajout de X"`).
+4. Poussez (`git push origin feature/ton-apport`).
+5. Ouvrez une Pull Request.
 
 ## 📜 Licence
 MIT License – voir [LICENSE](LICENSE).
@@ -91,4 +123,5 @@ MIT License – voir [LICENSE](LICENSE).
 ## 📬 Contact
 - **Auteur** : Ludovic Marchetti  
 - **Email** : contact@datahootcome.fr  
-- **GitHub** : [Ludovic-M-DAN](https://github.com/Ludovic-M-DAN)
+- **GitHub** : [Ludovic-M-DAN](https://github.com/Ludovic-M-DAN)  
+- **LinkedIn** : [L-Marchetti](https://www.linkedin.com/in/l-marchetti/)
