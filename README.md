@@ -5,12 +5,12 @@
 ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
-**Data Toolkit** est une application interactive Streamlit qui simplifie l'exploration, l'analyse et le traitement de fichiers CSV ou Excel. Elle s'adresse aux data scientists, analystes ou toute personne souhaitant explorer ses données via une interface intuitive.
+**Data Toolkit** est une application interactive Streamlit qui simplifie l'exploration, l'analyse et le traitement de fichiers CSV ou Excel. Elle s'adresse aux data scientists, analystes ou toute personne souhaitant explorer ses données via une interface intuitive, sans avoir a charger un notebook et le laisser à l'abandon avec les autres (😉).
 
-## 🎯 Motivation
-L’objectif est de centraliser les étapes courantes de l’analyse de données (souvent dispersées dans des scripts ou notebooks) dans un outil convivial, afin de gagner du temps et de se concentrer sur l’interprétation des résultats.
+## 🌱 La genése 
+À l'origine, je souhaitais simplement disposer d'un outil rapide pour visualiser le contenu d'un dataset. Par la suite, ayant eu besoin d'échantillonner un fichier CSV volumineux (> 3 Go), j'ai intégré cette fonctionnalité au premier outil. Et pourquoi s'arrêter en si bon chemin ? J'ai donc ajouté des analyses exploratoires basiques, ainsi que des analyses un peu plus poussées permettant de visualiser clairement les données. Ainsi est née la V1.
 
-## 🚀 Fonctionnalités
+## ⚙️ Fonctionnalités
 
 ### Basiques
 - **Chargement** : Import de fichiers CSV/Excel (jusqu’à 5 Go) avec séparateur personnalisé.
@@ -64,24 +64,35 @@ streamlit_data_toolkit/
    pip install -r requirements.txt
    ```
 
-4. **Lancer l’app** :
+4. **Lancer l’app en augmentant la limite de fichier a 5Go** :
    ```bash
-   streamlit run app.py
+   streamlit run app.py --server.maxUploadSize=5000
    ```
 
 Ouvrez [http://localhost:8501](http://localhost:8501) dans votre navigateur.
 
-### Astuce rapide pour ne pas se compliquer la vie
+### :accessibility: Astuce rapide pour ne pas se compliquer la vie
 Pour lancer l’application rapidement, créez un fichier batch `run_app.bat` à la racine du projet avec le contenu suivant :
 
 ```bat
 @echo off
+
+:: Créer un environnement virtuel
 python -m venv venv
+
+:: Activer l'environnement virtuel
 call venv\Scripts\activate
+
+:: Installer les dépendances
 pip install -r requirements.txt
+
+:: Lancer l'application Streamlit avec une limite de fichier de 5 Go
 start "" http://localhost:8501
-streamlit run app.py
+streamlit run app.py --server.maxUploadSize=5000
+
+:: Mettre en pause pour voir les éventuelles erreurs
 pause
+
 ```
 
 ## 📦 Dépendances principales
