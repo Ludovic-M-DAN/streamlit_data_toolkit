@@ -119,7 +119,7 @@ Pour voir toutes les dépendances, consultez le fichier [`requirements.txt`](req
 
 ## 🎥 Vidéo
 🎬 ![Vidéo](https://img.shields.io/badge/Video-Play-green?style=flat&logo=youtube&logoColor=white)  
-[📽️ Regarder la démo](https://github.com/Ludovic-M-DAN/streamlit_data_toolkit/raw/main/docs/Demo.mp4)
+[📽️ Regarder la démo](https://youtu.be/oglqO8-qINE)
 
 ## 🤝 Contribuer
 1. Fork le repo.
