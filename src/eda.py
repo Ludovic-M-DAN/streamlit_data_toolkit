@@ -1,3 +1,4 @@
+# eda.py
 import pandas as pd
 
 def get_data_info(df):
@@ -5,7 +6,7 @@ def get_data_info(df):
     Génère un dictionnaire avec les informations de base sur le DataFrame.
     
     :param df: DataFrame à analyser
-    :return: Dictionnaire avec les informations
+    :return: Dictionnaire avec les informations (dimensions, colonnes, types, valeurs manquantes)
     """
     info = {
         'dimensions': df.shape,

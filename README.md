@@ -26,23 +26,22 @@
 ## 📂 Structure du Repository
 ```
 streamlit_data_toolkit/
-├── data/                     # Datasets d’exemple
-├── docs/                     # Documentation détaillée
-│   ├── user_guide.md
-│   └── api_reference.md
-├── src/                      # Code source
-│   ├── config.py
-│   ├── data_loader.py
-│   ├── eda.py
-│   ├── eda_advanced.py
-│   └── utils.py
-├── tests/                    # Tests unitaires
-├── .gitignore
-├── app.py                    # Application principale
-├── LICENSE                   # MIT License
-├── logo.png                  # Logo
-├── README.md
-└── requirements.txt          # Dépendances
+├── data/                   # Datasets d’exemple
+├── docs/                   # Documentation détaillée (guides, API, etc.)
+├── src/                    # Code source
+│   ├── config.py           # Paramètres de configuration
+│   ├── data_loader.py      # Fonctions de chargement et d'échantillonnage
+│   ├── eda.py              # Fonctions d'analyse exploratoire (EDA)
+│   ├── eda_advanced.py     # Visualisations avancées (histogrammes, heatmaps, etc.)
+│   ├── treatments.py       # Fonctions de traitement (renommage, remplissage, etc.)
+│   ├── ui_upload.py        # Gestion de l'upload et détection d'encodage
+│   ├── ui_utils.py         # Fonctions UI utilitaires (choix du dossier, nom par défaut)
+│   ├── version.py          # Informations de version et nouveautés
+├── CHANGELOG.md            # Historique des modifications et nouveautés
+├── app.py                  # Application principale (Streamlit)
+├── README.md               # Présentation du projet
+├── requirements.txt        # Dépendances
+└── logo.png                # Logo de l'application
 ```
 
 ## 🛠️ Installation

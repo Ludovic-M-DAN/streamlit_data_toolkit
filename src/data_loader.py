@@ -1,19 +1,20 @@
+# data_loader.py
 import pandas as pd
 
 def load_data(file_path, separator=',', encoding='utf-8'):
     """
     Charge un fichier CSV ou Excel dans un DataFrame pandas.
     
-    :param file_path: Chemin du fichier (str) ou objet fichier (par exemple, UploadedFile)
+    :param file_path: Chemin du fichier (str) ou objet fichier (ex: UploadedFile)
     :param separator: Séparateur pour les fichiers CSV (par défaut ',')
     :param encoding: Encodage du fichier (par défaut 'utf-8')
     :return: DataFrame pandas
     """
-    # Vérifie si file_path est une chaîne ou un objet fichier
+    # Vérifier si file_path est une chaîne ou un objet fichier
     if isinstance(file_path, str):
         file_name = file_path
     else:
-        file_name = file_path.name  # Suppose que l'objet a un attribut 'name'
+        file_name = file_path.name  # On suppose que l'objet possède un attribut 'name'
     
     if file_name.endswith('.csv'):
         return pd.read_csv(file_path, sep=separator, encoding=encoding)
@@ -35,7 +36,7 @@ def sample_data(df, method, n=None, frac=None):
     if method == 'random_total':
         return df.sample(n=n) if n else df.sample(frac=frac)
     elif method == 'random_representatif':
-        # Échantillonnage aléatoire simple (à améliorer avec stratification si besoin)
+        # Échantillonnage aléatoire simple (à améliorer si une stratification est nécessaire)
         return df.sample(n=n) if n else df.sample(frac=frac)
     elif method == 'first_n':
         return df.head(n)

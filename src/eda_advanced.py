@@ -1,3 +1,4 @@
+# eda_advanced.py
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -13,7 +14,10 @@ def plot_distribution(df, col):
     return fig
 
 def plot_correlation(df):
-    """Génère une matrice de corrélation si plus d'une colonne numérique est présente."""
+    """
+    Génère une matrice de corrélation pour les colonnes numériques 
+    si au moins deux sont présentes.
+    """
     numerical_cols = df.select_dtypes(include=['float64', 'int64']).columns
     if len(numerical_cols) > 1:
         corr = df[numerical_cols].corr()
@@ -23,11 +27,14 @@ def plot_correlation(df):
     return None
 
 def plot_missing_values(df):
+    """
+    Visualise les valeurs manquantes sous forme de barres.
+    """
     missing_values = df.isnull().sum()
     if missing_values.sum() > 0:
         fig, ax = plt.subplots()
         sns.barplot(x=missing_values.index, y=missing_values.values, ax=ax)
-        ax.set_xticks(range(len(missing_values.index)))  # Définit les ticks explicitement
+        ax.set_xticks(range(len(missing_values.index)))  # Définit explicitement les ticks
         ax.set_xticklabels(missing_values.index, rotation=90)
         return fig
     return None
@@ -35,5 +42,5 @@ def plot_missing_values(df):
 def plot_boxplot(df, col):
     """Génère une boîte à moustaches pour la colonne spécifiée."""
     fig, ax = plt.subplots()
-    sns.boxplot(x=df[col], ax=ax,orient='v')
+    sns.boxplot(x=df[col], ax=ax, orient='v')
     return fig
