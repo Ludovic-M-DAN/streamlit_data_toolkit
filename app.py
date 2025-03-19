@@ -26,7 +26,7 @@ logging.basicConfig(
 if 'df' not in st.session_state:
     st.session_state.df = None                   # DataFrame actuellement utilisé
 if 'separator' not in st.session_state:
-    st.session_state.separator = DEFAULT_SEPARATOR  # Séparateur par défaut pour CSV
+    st.session_state.separator = DEFAULT_SEPARATOR  # Séparateur par défaut pour CSV (lecture)
 if 'encoding' not in st.session_state:
     st.session_state.encoding = 'utf-8'           # Encodage par défaut
 if 'loaded' not in st.session_state:
@@ -51,7 +51,7 @@ if 'original_file_name' not in st.session_state:
 # ------------------ Bouton Reset ------------------
 if st.sidebar.button("Reset App"):
     st.session_state.clear()
-    st.experimental_rerun()
+    st.rerun()  # À partir de Streamlit 1.18, st.rerun() remplace st.experimental_rerun()
 
 # ------------------ Titre et Sidebar ------------------
 st.title(APP_NAME)
@@ -84,9 +84,12 @@ if uploaded_file is not None:
     )
     if uploaded_file.name.endswith('.csv'):
         separators = [",", ";", "\\t", "|"]
-        default_sep_index = separators.index(st.session_state.separator) if st.session_state.separator in separators else 0
+        if st.session_state.separator in separators:
+            default_sep_index = separators.index(st.session_state.separator)
+        else:
+            default_sep_index = 0
         st.session_state.separator = st.selectbox(
-            "Choisir le séparateur CSV",
+            "Choisir le séparateur CSV (lecture)",
             options=separators,
             index=default_sep_index
         )
@@ -136,7 +139,11 @@ if st.session_state.loaded and st.session_state.df is not None:
         use_last = st.checkbox("Utiliser le fichier généré précédemment", value=True)
         if use_last:
             try:
-                df_new = load_data(st.session_state.last_file, separator=st.session_state.separator, encoding=st.session_state.encoding)
+                df_new = load_data(
+                    st.session_state.last_file,
+                    separator=st.session_state.separator,  # Important : on relit avec le même séparateur choisi !
+                    encoding=st.session_state.encoding
+                )
                 st.session_state.df = df_new
                 df = df_new
                 st.info(f"Fichier {st.session_state.last_file} chargé pour le traitement.")
@@ -158,12 +165,19 @@ if st.session_state.loaded and st.session_state.df is not None:
         with st.form("eda_form"):
             st.write("**Sélectionnez les colonnes à analyser :**")
             for col in df.columns:
-                st.session_state.selected_columns[col] = st.checkbox(col, value=st.session_state.selected_columns.get(col, True), key=f"col_{col}")
+                st.session_state.selected_columns[col] = st.checkbox(
+                    col, value=st.session_state.selected_columns.get(col, True), key=f"col_{col}"
+                )
             st.write("**Sélectionnez les types d'analyse :**")
             analyses = ["Statistiques descriptives", "Distribution", "Corrélation", "Valeurs manquantes", "Boîtes à moustaches"]
             for analysis in analyses:
-                st.session_state.selected_analyses[analysis] = st.checkbox(analysis, value=st.session_state.selected_analyses.get(analysis, False), key=f"analysis_{analysis}")
+                st.session_state.selected_analyses[analysis] = st.checkbox(
+                    analysis,
+                    value=st.session_state.selected_analyses.get(analysis, False),
+                    key=f"analysis_{analysis}"
+                )
             submitted = st.form_submit_button("Appliquer EDA+")
+
         if submitted:
             st.subheader("Résultats de l'EDA+")
             selected_columns = [col for col, selected in st.session_state.selected_columns.items() if selected]
@@ -218,17 +232,34 @@ if st.session_state.loaded and st.session_state.df is not None:
                     frac = percentage / 100
                     n = None
                 else:
-                    n = st.number_input("Nombre de lignes à échantillonner", min_value=1, max_value=len(df), value=min(1000, len(df)))
+                    n = st.number_input(
+                        "Nombre de lignes à échantillonner", min_value=1, max_value=len(df), value=min(1000, len(df))
+                    )
                     frac = None
             else:
                 n = st.number_input("Nombre de lignes à échantillonner", min_value=1, max_value=len(df), value=min(1000, len(df)))
                 frac = None
+            
             output_dir = select_output_dir()
             default_output_name = get_default_output_name("echantillonnage")
             output_name = st.text_input("Nom du fichier de sortie", default_output_name)
             output_format = st.selectbox("Format de sortie", ["CSV", "Excel"])
-            output_encoding = st.selectbox("Choisir l'encodage pour le fichier de sortie", 
-                                           options=["utf-8", "utf-8-sig", "latin-1", "iso-8859-1", "cp1252", "ascii"], index=0)
+            
+            # Choix du séparateur spécifique pour l'export CSV
+            export_separators = [",", ";", "\t", "|"]
+            export_separator = st.selectbox(
+                "Choisir le séparateur CSV pour l'exportation (si CSV)",
+                options=export_separators,
+                index=0
+            )
+
+            # Choix de l'encodage
+            output_encoding = st.selectbox(
+                "Choisir l'encodage pour le fichier de sortie",
+                options=["utf-8", "utf-8-sig", "latin-1", "iso-8859-1", "cp1252", "ascii"],
+                index=0
+            )
+
             if st.button("Échantillonner"):
                 try:
                     df_sample = sample_data(df, method, n, frac)
@@ -237,12 +268,15 @@ if st.session_state.loaded and st.session_state.df is not None:
                     st.write(f"**Dimensions de l'échantillon :** {df_sample.shape[0]} lignes, {df_sample.shape[1]} colonnes")
                     sample_size = df_sample.memory_usage(deep=True).sum()
                     st.write(f"**Taille estimée en mémoire de l'échantillon :** {sample_size / (1024 * 1024):.2f} Mo")
+
                     if output_format == "CSV":
                         output_path = os.path.join(output_dir, f"{output_name}.csv")
-                        df_sample.to_csv(output_path, index=False, encoding=output_encoding)
+                        # On utilise le séparateur choisi pour l'export CSV
+                        df_sample.to_csv(output_path, index=False, encoding=output_encoding, sep=export_separator)
                     else:
                         output_path = os.path.join(output_dir, f"{output_name}.xlsx")
                         df_sample.to_excel(output_path, index=False)
+                    
                     st.success(f"Fichier sauvegardé sous {output_path}")
                     st.session_state.last_file = output_path
                 except Exception as e:
@@ -267,12 +301,22 @@ if st.session_state.loaded and st.session_state.df is not None:
                     default_output_name = get_default_output_name("renommage")
                     output_name = st.text_input("Nom du fichier de sortie", default_output_name)
                     output_format = st.selectbox("Format de sortie", ["CSV", "Excel"])
-                    output_encoding = st.selectbox("Choisir l'encodage pour le fichier de sortie", 
-                                                   options=["utf-8", "utf-8-sig", "latin-1", "iso-8859-1", "cp1252", "ascii"], index=0)
+                    output_encoding = st.selectbox(
+                        "Choisir l'encodage pour le fichier de sortie",
+                        options=["utf-8", "utf-8-sig", "latin-1", "iso-8859-1", "cp1252", "ascii"],
+                        index=0
+                    )
+                    # Optionnel : un séparateur pour l'export CSV si voulu
+                    export_separators = [",", ";", "\t", "|"]
+                    export_separator = st.selectbox(
+                        "Séparateur CSV (si CSV)",
+                        options=export_separators,
+                        index=0
+                    )
                     if st.button("Enregistrer le fichier renommé"):
                         if output_format == "CSV":
                             output_path = os.path.join(output_dir, f"{output_name}.csv")
-                            df_renamed.to_csv(output_path, index=False, encoding=output_encoding)
+                            df_renamed.to_csv(output_path, index=False, encoding=output_encoding, sep=export_separator)
                         else:
                             output_path = os.path.join(output_dir, f"{output_name}.xlsx")
                             df_renamed.to_excel(output_path, index=False)
@@ -286,12 +330,21 @@ if st.session_state.loaded and st.session_state.df is not None:
             st.subheader("Remplissage des valeurs null / NaN")
             st.write("**Nombre de valeurs null par colonne :**")
             missing_counts = df.isnull().sum()
-            st.dataframe(missing_counts.reset_index().rename(columns={'index': 'Colonne', 0: 'Nombre de null'}))
+            st.dataframe(
+                missing_counts.reset_index().rename(columns={'index': 'Colonne', 0: 'Nombre de null'}),
+                use_container_width=True
+            )
             cols_with_null = missing_counts[missing_counts > 0].index.tolist()
-            selected_cols = st.multiselect("Sélectionnez les colonnes à traiter", options=df.columns.tolist(), default=cols_with_null)
+            selected_cols = st.multiselect(
+                "Sélectionnez les colonnes à traiter", 
+                options=df.columns.tolist(), 
+                default=cols_with_null
+            )
             if selected_cols:
-                method_option = st.selectbox("Sélectionnez la méthode de remplacement", 
-                                             options=["0", "mean", "median", "ffill", "bfill", "custom"])
+                method_option = st.selectbox(
+                    "Sélectionnez la méthode de remplacement", 
+                    options=["0", "mean", "median", "ffill", "bfill", "custom"]
+                )
                 custom_value = None
                 if method_option == "custom":
                     custom_value = st.text_input("Entrez la valeur à utiliser pour le remplacement")
@@ -305,12 +358,22 @@ if st.session_state.loaded and st.session_state.df is not None:
                         default_output_name = get_default_output_name("remplissage")
                         output_name = st.text_input("Nom du fichier de sortie", default_output_name)
                         output_format = st.selectbox("Format de sortie", ["CSV", "Excel"])
-                        output_encoding = st.selectbox("Choisir l'encodage pour le fichier de sortie", 
-                                                       options=["utf-8", "utf-8-sig", "latin-1", "iso-8859-1", "cp1252", "ascii"], index=0)
+                        output_encoding = st.selectbox(
+                            "Choisir l'encodage pour le fichier de sortie",
+                            options=["utf-8", "utf-8-sig", "latin-1", "iso-8859-1", "cp1252", "ascii"],
+                            index=0
+                        )
+                        # Optionnel : un séparateur pour l'export CSV
+                        export_separators = [",", ";", "\t", "|"]
+                        export_separator = st.selectbox(
+                            "Séparateur CSV (si CSV)",
+                            options=export_separators,
+                            index=0
+                        )
                         if st.button("Enregistrer le fichier traité"):
                             if output_format == "CSV":
                                 output_path = os.path.join(output_dir, f"{output_name}.csv")
-                                df_filled.to_csv(output_path, index=False, encoding=output_encoding)
+                                df_filled.to_csv(output_path, index=False, encoding=output_encoding, sep=export_separator)
                             else:
                                 output_path = os.path.join(output_dir, f"{output_name}.xlsx")
                                 df_filled.to_excel(output_path, index=False)
