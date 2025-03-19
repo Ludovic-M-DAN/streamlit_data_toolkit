@@ -3,8 +3,8 @@
 
 APP_NAME = "Data Toolkit"
 NOM = "Ludovic Marchetti"
-VERSION = "1.1.4"
-LAST_UPDATE = "18/03/2025"
+VERSION = "1.1.5"
+LAST_UPDATE = "19/03/2025"
 CONTACT = "contact@datatoolkit.com"
 
 # Liste des dernières nouveautés de cette version
